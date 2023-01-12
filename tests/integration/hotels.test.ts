@@ -17,6 +17,7 @@ import {
   createTicketTypeRemote,
   createHotel,
   createRoomWithHotelId,
+  createBooking,
 } from "../factories";
 import { cleanDb, generateValidToken } from "../helpers";
 
@@ -89,6 +90,8 @@ describe("GET /hotels", () => {
       const payment = await createPayment(ticket.id, ticketType.price);
 
       const createdHotel = await createHotel();
+      const createdRoom = await createRoomWithHotelId(createdHotel.id);
+      const createdBooking = await createBooking({ roomId: createdRoom.id, userId: user.id });
 
       const response = await server.get("/hotels").set("Authorization", `Bearer ${token}`);
 
@@ -100,7 +103,22 @@ describe("GET /hotels", () => {
           name: createdHotel.name,
           image: createdHotel.image,
           createdAt: createdHotel.createdAt.toISOString(),
-          updatedAt: createdHotel.updatedAt.toISOString()
+          updatedAt: createdHotel.updatedAt.toISOString(),
+          Rooms: [
+            {
+              id: createdRoom.id,
+              capacity: createdRoom.capacity,
+              hotelId: createdRoom.hotelId,
+              name: createdRoom.name,
+              createdAt: createdRoom.createdAt.toISOString(),
+              updatedAt: createdRoom.updatedAt.toISOString(),
+              Booking: [
+                {
+                  roomId: createdRoom.id
+                }
+              ]
+            }
+          ]
         }
       ]);
     });
