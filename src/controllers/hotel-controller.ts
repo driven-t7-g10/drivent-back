@@ -38,6 +38,7 @@ export async function getHotelsWithRooms(req: AuthenticatedRequest, res: Respons
     if (error.name === "cannotListHotelsError") {
       return res.sendStatus(httpStatus.PAYMENT_REQUIRED);
     }
+    if (error.name === "ForbiddenError") return res.sendStatus(httpStatus.FORBIDDEN);
     return res.sendStatus(httpStatus.BAD_REQUEST);
   }
 }
