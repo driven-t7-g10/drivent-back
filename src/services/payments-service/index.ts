@@ -27,6 +27,28 @@ async function getPaymentByTicketId(userId: number, ticketId: number) {
   return payment;
 }
 
+async function getPaymentByUserId(userId: number) {
+  const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
+  if (!enrollment) {
+    throw notFoundError();
+  }
+  const ticket = await ticketRepository.findTicketByEnrollmentId(enrollment.id);
+  if (!ticket) {
+    throw notFoundError();
+  }
+
+  const payment = await getPaymentByTicketId(userId, ticket.id);
+
+  if (!payment) {
+    throw notFoundError();
+  }
+
+  return {
+    payment,
+    ticket
+  };
+}
+
 async function paymentProcess(ticketId: number, userId: number, cardData: CardPaymentParams) {
   await verifyTicketAndEnrollment(ticketId, userId);
 
@@ -57,6 +79,7 @@ export type CardPaymentParams = {
 const paymentService = {
   getPaymentByTicketId,
   paymentProcess,
+  getPaymentByUserId
 };
 
 export default paymentService;
