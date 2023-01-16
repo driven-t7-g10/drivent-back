@@ -24,7 +24,6 @@ export async function postCreateOrUpdateEnrollment(req: AuthenticatedRequest, re
 
     return res.sendStatus(httpStatus.OK);
   } catch (error) {
-    console.log("enrol caiu aqui");
     return res.sendStatus(httpStatus.BAD_REQUEST);
   }
 }

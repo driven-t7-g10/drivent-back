@@ -8,14 +8,15 @@ datasource db {
 }
 
 model User {
-  id         Int         @id @default(autoincrement())
-  email      String      @unique @db.VarChar(255)
-  password   String      @db.VarChar(255)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  Booking    Booking[]
-  Enrollment Enrollment?
+  id         Int          @id @default(autoincrement())
+  email      String       @unique @db.VarChar(255)
+  password   String       @db.VarChar(255)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @default(now())
   Session    Session[]
+  Enrollment Enrollment[]
+  Booking    Booking[]
+  Entry      Entry[]
 }
 
 model Session {
@@ -23,8 +24,7 @@ model Session {
   userId    Int
   token     String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  User      User     @relation(fields: [userId], references: [id])
+  updatedAt DateTime @default(now())
 }
 
 model Event {
@@ -35,7 +35,8 @@ model Event {
   startsAt           DateTime
   endsAt             DateTime
   createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  updatedAt          DateTime @default(now())
+  Activity           Activity[]
 }
 
 model Enrollment {
@@ -43,12 +44,12 @@ model Enrollment {
   name      String   @db.VarChar(255)
   cpf       String   @db.VarChar(255)
   birthday  DateTime
-  phone     String   @db.VarChar(255)
-  userId    Int      @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Address   Address?
-  User      User     @relation(fields: [userId], references: [id])
+  phone     String    @db.VarChar(255)
+  userId    Int       @unique
+  User      User      @relation(fields: [userId], references: [id])
+  Address   Address[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
   Ticket    Ticket[]
 }
 
@@ -63,8 +64,7 @@ model Address {
   addressDetail String?    @db.VarChar(255)
   enrollmentId  Int        @unique
   createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  Enrollment    Enrollment @relation(fields: [enrollmentId], references: [id])
+  updatedAt     DateTime   @default(now())
 }
 
 model TicketType {
@@ -74,7 +74,7 @@ model TicketType {
   isRemote      Boolean
   includesHotel Boolean
   createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  updatedAt     DateTime @default(now())
   Ticket        Ticket[]
 }
 
@@ -84,7 +84,7 @@ model Ticket {
   enrollmentId Int
   status       TicketStatus
   createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  updatedAt    DateTime     @default(now())
   Payment      Payment[]
   Enrollment   Enrollment   @relation(fields: [enrollmentId], references: [id])
   TicketType   TicketType   @relation(fields: [ticketTypeId], references: [id])
@@ -97,8 +97,7 @@ model Payment {
   cardIssuer     String
   cardLastDigits String
   createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  Ticket         Ticket   @relation(fields: [ticketId], references: [id])
+  updatedAt      DateTime @default(now())
 }
 
 model Hotel {
@@ -106,8 +105,7 @@ model Hotel {
   name      String
   image     String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Rooms     Room[]
+  updatedAt DateTime @default(now())
 }
 
 model Room {
@@ -116,9 +114,7 @@ model Room {
   capacity  Int
   hotelId   Int
   createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  Booking   Booking[]
-  Hotel     Hotel     @relation(fields: [hotelId], references: [id])
+  updatedAt DateTime  @default(now())
 }
 
 model Booking {
@@ -126,12 +122,27 @@ model Booking {
   userId    Int
   roomId    Int
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Room      Room     @relation(fields: [roomId], references: [id])
-  User      User     @relation(fields: [userId], references: [id])
+  updatedAt DateTime @default(now())
 }
 
-enum TicketStatus {
-  RESERVED
-  PAID
+model Activity {
+  id        Int      @id @default(autoincrement())
+  name      String
+  startsAt  DateTime
+  endsAt    DateTime
+  eventId   Int
+  Event     Event    @relation(fields: [eventId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  Entry     Entry[]
+}
+
+model Entry {
+  id          Int      @id @default(autoincrement())
+  activityId  Int
+  Activity    Activity @relation(fields: [activityId], references: [id])
+  userId      Int
+  User        User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }
